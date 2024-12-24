@@ -1,0 +1,400 @@
+Index: src/main/java/CSVReaderExample.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/CSVReaderExample.java b/src/main/java/CSVReaderExample.java
+new file mode 100644
+--- /dev/null	(date 1735069762013)
++++ b/src/main/java/CSVReaderExample.java	(date 1735069762013)
+@@ -0,0 +1,26 @@
++import com.opencsv.CSVReader;
++import com.opencsv.exceptions.CsvValidationException;
++import java.io.FileReader;
++import java.io.IOException;
++import java.net.URL;
++
++public class CSVReaderExample {
++    public static void main(String[] args) {
++        // Փորձեք գտնել movies.csv ֆայլը resources ֆոլդերում
++        URL resource = CSVReaderExample.class.getClassLoader().getResource("movies.csv");
++
++        // Եթե ֆայլը չի գտնվել resources-ում, վերցրու բացարձակ ուղի
++        String filePath = (resource != null) ? resource.getPath() : "src/main/resources/movies.csv";
++
++        try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
++            String[] nextLine;
++            while ((nextLine = reader.readNext()) != null) {
++                // Տպում ենք CSV ֆայլի յուրաքանչյուր տողը
++                System.out.println("Rank: " + nextLine[0] + ", Title: " + nextLine[1] + ", Year: " + nextLine[2] + ", Image: " + nextLine[3] + ", Description: " + nextLine[4]);
++            }
++        } catch (IOException | CsvValidationException e) {
++            // Տպում ենք սխալի հաղորդագրությունը, եթե ինչ-որ բան սխալ է գնացել
++            System.out.println("Դեպի կարդալու սխալ: " + e.getMessage());
++        }
++    }
++}
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+--- /dev/null	(date 1735062593293)
++++ b/.gitignore	(date 1735062593293)
+@@ -0,0 +1,38 @@
++target/
++!.mvn/wrapper/maven-wrapper.jar
++!**/src/main/**/target/
++!**/src/test/**/target/
++
++### IntelliJ IDEA ###
++.idea/modules.xml
++.idea/jarRepositories.xml
++.idea/compiler.xml
++.idea/libraries/
++*.iws
++*.iml
++*.ipr
++
++### Eclipse ###
++.apt_generated
++.classpath
++.factorypath
++.project
++.settings
++.springBeans
++.sts4-cache
++
++### NetBeans ###
++/nbproject/private/
++/nbbuild/
++/dist/
++/nbdist/
++/.nb-gradle/
++build/
++!**/src/main/**/build/
++!**/src/test/**/build/
++
++### VS Code ###
++.vscode/
++
++### Mac OS ###
++.DS_Store
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+new file mode 100644
+--- /dev/null	(date 1735062602937)
++++ b/.idea/vcs.xml	(date 1735062602937)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="$PROJECT_DIR$" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: src/main/java/com/example/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/Main.java b/src/main/java/com/example/Main.java
+new file mode 100644
+--- /dev/null	(date 1735062593309)
++++ b/src/main/java/com/example/Main.java	(date 1735062593309)
+@@ -0,0 +1,17 @@
++package com.example;
++
++//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
++// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
++public class Main {
++    public static void main(String[] args) {
++        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
++        // to see how IntelliJ IDEA suggests fixing it.
++        System.out.printf("Hello and welcome!");
++
++        for (int i = 1; i <= 5; i++) {
++            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
++            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
++            System.out.println("i = " + i);
++        }
++    }
++}
+\ No newline at end of file
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+new file mode 100644
+--- /dev/null	(date 1735062601496)
++++ b/.idea/.gitignore	(date 1735062601496)
+@@ -0,0 +1,3 @@
++# Default ignored files
++/shelf/
++/workspace.xml
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+new file mode 100644
+--- /dev/null	(date 1735069085842)
++++ b/pom.xml	(date 1735069085842)
+@@ -0,0 +1,47 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project xmlns="http://maven.apache.org/POM/4.0.0"
++         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
++    <modelVersion>4.0.0</modelVersion>
++
++    <groupId>com.example</groupId>
++    <artifactId>untitled6</artifactId>
++    <version>1.0-SNAPSHOT</version>
++
++    <properties>
++        <maven.compiler.source>23</maven.compiler.source>
++        <maven.compiler.target>23</maven.compiler.target>
++        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
++    </properties>
++
++    <dependencies>
++        <!-- Jsoup dependency -->
++        <dependency>
++            <groupId>org.jsoup</groupId>
++            <artifactId>jsoup</artifactId>
++            <version>1.15.4</version>
++        </dependency>
++
++        <!-- OpenCSV dependency -->
++        <dependency>
++            <groupId>com.opencsv</groupId>
++            <artifactId>opencsv</artifactId>
++            <version>5.6</version>
++        </dependency>
++
++        <!-- JFreeChart dependency -->
++        <dependency>
++            <groupId>org.jfree</groupId>
++            <artifactId>jfreechart</artifactId>
++            <version>1.5.3</version>
++        </dependency>
++    </dependencies>
++
++    <build>
++        <resources>
++            <resource>
++                <directory>src/main/resources</directory>
++            </resource>
++        </resources>
++    </build>
++</project>
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+new file mode 100644
+--- /dev/null	(date 1735062602908)
++++ b/.idea/misc.xml	(date 1735062602908)
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ExternalStorageConfigurationManager" enabled="true" />
++  <component name="MavenProjectsManager">
++    <option name="originalFiles">
++      <list>
++        <option value="$PROJECT_DIR$/pom.xml" />
++      </list>
++    </option>
++  </component>
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_23" default="true" project-jdk-name="23" project-jdk-type="JavaSDK">
++    <output url="file://$PROJECT_DIR$/out" />
++  </component>
++</project>
+\ No newline at end of file
+Index: src/main/java/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/Main.java b/src/main/java/Main.java
+new file mode 100644
+--- /dev/null	(date 1735069601618)
++++ b/src/main/java/Main.java	(date 1735069601618)
+@@ -0,0 +1,86 @@
++import org.jsoup.Jsoup;
++import org.jsoup.nodes.Document;
++import org.jsoup.select.Elements;
++import com.opencsv.CSVWriter;
++import java.io.FileWriter;
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++
++class Movie {
++    private String rank;
++    private String title;
++    private String year;
++    private String image;
++    private String description;
++
++    public Movie(String rank, String title, String year, String image, String description) {
++        this.rank = rank;
++        this.title = title;
++        this.year = year;
++        this.image = image;
++        this.description = description;
++    }
++
++    public String getRank() {
++        return rank;
++    }
++
++    public String getTitle() {
++        return title;
++    }
++
++    public String getYear() {
++        return year;
++    }
++
++    public String getImage() {
++        return image;
++    }
++
++    public String getDescription() {
++        return description;
++    }
++
++    @Override
++    public String toString() {
++        return "Rank: " + rank + ", Title: " + title + ", Year: " + year + ", Image: " + image + ", Description: " + description;
++    }
++}
++
++public class Main {
++    public static void main(String[] args) {
++        try {
++            String url = "https://www.imdb.com/chart/top";
++            Document doc = Jsoup.connect(url).get();
++            Elements movies = doc.select(".titleColumn");
++
++            List<Movie> moviesList = new ArrayList<>();
++            for (int i = 0; i < movies.size(); i++) {
++                String rank = movies.get(i).text();
++                String title = movies.get(i).select("a").text();
++                String year = movies.get(i).select(".secondaryInfo").text();
++                String image = movies.get(i).select("img").attr("src");
++                String description = movies.get(i).select(".outline").text();
++                if (description.isEmpty()) {
++                    description = "No description available";
++                }
++                Movie movie = new Movie(rank, title, year, image, description);
++                moviesList.add(movie);
++            }
++
++            Collections.sort(moviesList, (m1, m2) -> Integer.compare(Integer.parseInt(m1.getRank()), Integer.parseInt(m2.getRank())));
++
++            try (CSVWriter writer = new CSVWriter(new FileWriter("movies.csv"))) {
++                writer.writeNext(new String[] {"Rank", "Title", "Year", "Image", "Description"});
++                for (Movie movie : moviesList) {
++                    writer.writeNext(new String[] {movie.getRank(), movie.getTitle(), movie.getYear(), movie.getImage(), movie.getDescription()});
++                }
++            }
++            System.out.println("Data saved to movies.csv");
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++    }
++}
++
+Index: src/main/java/resources
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/resources b/src/main/java/resources
+new file mode 100644
+--- /dev/null	(date 1735068991374)
++++ b/src/main/java/resources	(date 1735068991374)
+@@ -0,0 +1,22 @@
++your-project
++│
++└── src
++    └── main
++        └── resources
++            └── movies.csv
++URL resource = CSVReaderExample.class.getClassLoader().getResource("movies.csv");
++if (resource == null) {
++    System.out.println("Ֆայլը չի գտնվել.");
++} else {
++    String filePath = resource.getPath();
++    System.out.println("Ֆայլը գտնվել է: " + filePath);
++    try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
++        String[] nextLine;
++        while ((nextLine = reader.readNext()) != null) {
++            System.out.println("Rank: " + nextLine[0] + ", Title: " + nextLine[1] + ", Year: " + nextLine[2] + ", Image: " + nextLine[3] + ", Description: " + nextLine[4]);
++        }
++    } catch (IOException | CsvValidationException e) {
++        System.out.println("Դեպի կարդալու սխալ: " + e.getMessage());
++    }
++}
++
+Index: src/main/java/CSVValidator.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/CSVValidator.java b/src/main/java/CSVValidator.java
+new file mode 100644
+--- /dev/null	(date 1735066910734)
++++ b/src/main/java/CSVValidator.java	(date 1735066910734)
+@@ -0,0 +1,37 @@
++import com.opencsv.CSVReader;
++import com.opencsv.exceptions.CsvException;
++import java.io.FileReader;
++import java.io.IOException;
++import java.util.Arrays;
++import java.util.List;
++
++public class CSVValidator {
++    public static void main(String[] args) {
++        String file = "src/main/resources/movies.csv";  // Գործնական ֆայլի ուղին
++
++        try {
++            // CSV ֆայլի ընթերցում
++            CSVReader reader = new CSVReader(new FileReader(file));
++
++            // Լիցքավորում ենք բոլոր տողերը CSV-ից
++            List<String[]> rows = reader.readAll();
++
++            // Ստուգում ենք տվյալների յուրաքանչյուր տողը, բացառում ենք առաջին տողը (header)
++            for (int i = 1; i < rows.size(); i++) {  // Շատ կարևոր է սկսել առաջին տողից հետո
++                String[] row = rows.get(i);
++
++                // Ստուգում ենք, արդյոք բոլոր 5 սյուները կա
++                if (row.length == 5) {
++                    System.out.println("Rank: " + row[0] + ", Title: " + row[1] + ", Year: " + row[2] + ", Image: " + row[3] + ", Description: " + row[4]);
++                } else {
++                    System.out.println("Invalid row (incomplete data): " + Arrays.toString(row));
++                }
++            }
++
++            // Փակում ենք CSVReader-ը
++            reader.close();
++        } catch (IOException | CsvException e) {
++            e.printStackTrace();
++        }
++    }
++}
