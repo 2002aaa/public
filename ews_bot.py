@@ -1,28 +1,32 @@
 # =========================
-# DAILY MONITORING VERSION
+# DAILY MONITORING VERSION (FIXED)
 # =========================
 
 import pandas as pd
 import numpy as np
 import yfinance as yf
 import requests
-from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+from datetime import datetime
+from pandas_datareader import data as pdr
 
-TOKEN = "8785731071:AAGBTF-jvQtaj4RzOOqPpMHV1YHnIuVnfZY"
+# =========================
+# TELEGRAM
+# =========================
+TOKEN = "ՔՈ_TOKEN_Ը"
 CHAT_ID = "@ewsarmenia"
 
+# =========================
+# DATE RANGE
+# =========================
 END_DATE = datetime.today()
 START_DATE = END_DATE - pd.DateOffset(years=5)
 
-print("Daily monitoring period:")
-print(START_DATE.date(), "→", END_DATE.date())# =========================
-# LOAD DAILY DATA
+print("Period:", START_DATE.date(), "→", END_DATE.date())
+
 # =========================
-
-import yfinance as yf
-from pandas_datareader import data as pdr
-
-# Yahoo Finance
+# LOAD DATA
+# =========================
 tickers = {
     "SP500": "^GSPC",
     "BRENT": "BZ=F",
@@ -32,17 +36,11 @@ tickers = {
 }
 
 yf_data = yf.download(list(tickers.values()), start=START_DATE, end=END_DATE)
-
-# rename columns
 yf_data = yf_data["Close"]
 yf_data.columns = tickers.keys()
 
-print("Yahoo shape:", yf_data.shape)
-
-
-# FRED տվյալներ
+# FRED
 fred_series = ["DGS2", "DGS5", "DGS10", "VIXCLS"]
-
 fred_data = pd.DataFrame()
 
 for s in fred_series:
@@ -51,49 +49,30 @@ for s in fred_series:
     except:
         print(f"{s} error")
 
-print("FRED shape:", fred_data.shape)
-
-
 # =========================
 # MERGE
 # =========================
-
 df = yf_data.join(fred_data, how="outer")
-
-# fill missing
 df = df.sort_index().ffill().bfill()
 
-print("Merged shape:", df.shape)
-df.tail()# =========================
-# FEATURE ENGINEERING
 # =========================
-
-# returns
+# FEATURES
+# =========================
 df["SP500_ret"] = df["SP500"].pct_change()
 df["BRENT_ret"] = df["BRENT"].pct_change()
 
-# FX volatility (RUB/USD որպես proxy)
 df["FX_vol_30"] = df["RUB_USD"].pct_change().rolling(30).std()
-
-# S&P volatility
 df["SP500_vol_30"] = df["SP500_ret"].rolling(30).std()
 
-# VIX z-score
 df["VIX_z"] = (df["VIXCLS"] - df["VIXCLS"].rolling(120).mean()) / df["VIXCLS"].rolling(120).std()
-
-# FX volatility z-score
 df["FX_vol_z"] = (df["FX_vol_30"] - df["FX_vol_30"].rolling(120).mean()) / df["FX_vol_30"].rolling(120).std()
 
-# Yield spread
 df["Yield_spread"] = df["DGS10"] - df["DGS2"]
-
-# inversion pressure (եթե բացասական է)
 df["Yield_inversion"] = (-df["Yield_spread"]).clip(lower=0)
 
 # =========================
-# NORMALIZATION (expanding)
+# NORMALIZATION
 # =========================
-
 def expanding_minmax(series):
     return (series - series.expanding().min()) / (series.expanding().max() - series.expanding().min())
 
@@ -106,7 +85,6 @@ df["BRENT_norm"] = expanding_minmax(-df["BRENT_ret"])
 # =========================
 # RISK SCORE
 # =========================
-
 df["RiskScore"] = (
     0.30 * df["VIX_norm"] +
     0.25 * df["FX_norm"] +
@@ -117,25 +95,34 @@ df["RiskScore"] = (
 
 df = df.dropna()
 
-print("Final df:", df.shape)
-df[["RiskScore"]].tail()import matplotlib.pyplot as plt
+# =========================
+# TAKE LATEST DAY
+# =========================
+latest = df.iloc[-1]
 
+report_date = latest.name.strftime("%Y-%m-%d")
+risk = latest["RiskScore"] * 100
+status = "STRESS 🔴" if latest["RiskScore"] > 0.5 else "NORMAL 🟢"
+
+print("Latest:", report_date, risk)
+
+# =========================
+# PLOT
+# =========================
 plt.figure(figsize=(10,5))
-
 plt.plot(df.index, df["RiskScore"], label="Risk Score")
 plt.axhline(df["RiskScore"].mean(), linestyle="--", label="Mean")
-
 plt.title("EWS Armenia Risk Score")
 plt.legend()
+plt.tight_layout()
 
-# save
-plt.savefig("risk_chart.png")
-plt.close()url_photo = f"https://api.telegram.org/bot{TOKEN}/sendPhoto"
+plt.savefig("risk_chart.png", dpi=200)
+plt.close()
 
-with open("risk_chart.png", "rb") as photo:
-    requests.post(url_photo, files={"photo": photo}, data={
-        "chat_id": CHAT_ID
-    })caption = f"""
+# =========================
+# TELEGRAM SEND
+# =========================
+caption = f"""
 📊 EWS Armenia — Daily Risk Assessment
 
 📅 Date: {report_date}
@@ -144,8 +131,12 @@ with open("risk_chart.png", "rb") as photo:
 ⏱ Forecast Horizon: t+2 days
 """
 
+url = f"https://api.telegram.org/bot{TOKEN}/sendPhoto"
+
 with open("risk_chart.png", "rb") as photo:
-    requests.post(url_photo, files={"photo": photo}, data={
+    r = requests.post(url, files={"photo": photo}, data={
         "chat_id": CHAT_ID,
         "caption": caption
     })
+
+print("Telegram:", r.status_code, r.text)
