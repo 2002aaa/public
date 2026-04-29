@@ -153,3 +153,17 @@ if resp.status_code == 200:
 else:
     print(f"ERROR: {resp.status_code} — {resp.text}")
     exit(1)
+# AUTO-PIN
+if resp.status_code == 200:
+    msg_id = resp.json()["result"]["message_id"]
+    
+    pin_url = f"https://api.telegram.org/bot{TOKEN}/pinChatMessage"
+    requests.post(pin_url, data={
+        "chat_id": CHAT_ID,
+        "message_id": msg_id,
+        "disable_notification": True
+    }, timeout=30)
+    print("DONE — message sent and pinned.")
+else:
+    print(f"ERROR: {resp.status_code} — {resp.text}")
+    exit(1)
